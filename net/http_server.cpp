@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <iostream>
 #include "http_data.h"
+#include "../base/logger.h"
 
 #define LISTENQ 1024
 
@@ -36,7 +37,7 @@ HttpServer::HttpServer(std::shared_ptr<EventLoop> loop, int thread_num, int port
         accept_channel_ = std::make_shared<Channel>(listen_fd_);
         accept_channel_->setFd(listen_fd_);
     }else {
-        std::cout << "listen error" << std::endl;
+        LOG_ERROR << "listen error";
     }
 }
 
@@ -44,7 +45,7 @@ void HttpServer::start() {
     thread_pool_->start();
     accept_channel_->setReadHandler(std::bind(&HttpServer::handNewConn, this));
     accept_channel_->setEvent(CHANNEL_CONN);
-    loop_->addToPoller(accept_channel_, true);
+    loop_->updateChannel(accept_channel_.get());
     started_ = true;
 }
 

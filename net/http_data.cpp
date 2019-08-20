@@ -1,7 +1,7 @@
 #include "http_data.h"
 #include "channel.h"
 #include "event_loop.h"
-#include "rio.h"
+#include "../base/rio.h"
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <iostream>
@@ -88,7 +88,7 @@ void HttpData::handleRead() {
         return;
     }
     channel_->setEvent(CHANNEL_READ|CHANNEL_WRITE);
-    loop_->updatePoller(channel_);
+    loop_->updateChannel(channel_.get());
 }
 
 void HttpData::handleWrite() {
@@ -101,10 +101,10 @@ void HttpData::handleWrite() {
     }
     serve_static(fd_, filename.c_str(), sbuf.st_size);
     channel_->setEvent(CHANNEL_READ);
-    loop_->updatePoller(channel_);
+    loop_->updateChannel(channel_.get());
 }
 
 void HttpData::newRequest() {
     channel_->setEvent(CHANNEL_READ);
-    loop_->addToPoller(channel_);
+    loop_->updateChannel(channel_.get());
 }

@@ -5,7 +5,7 @@
 
 
 AppendFile::AppendFile(const std::string &path) : 
-    fp_(fopen(path.c_str(), "ae")),
+    fp_(fopen(path.c_str(), "a")),
     writtenBytes_(0) {
 #ifdef _WIN32
     setvbuf(fp_, buffer_, _IOFBF, sizeof buffer_);

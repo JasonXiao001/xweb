@@ -101,6 +101,9 @@ Logger::~Logger() {
     impl_.finish();
     const LogStream::Buffer& buf(stream().buffer());
     g_output(buf.data(), buf.length());
+    if (impl_.level_ == E_FATAL) {
+        abort();
+    }
 }
 
 void Logger::setLogLevel(Logger::LogLevel level)

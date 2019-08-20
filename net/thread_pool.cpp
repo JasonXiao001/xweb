@@ -1,6 +1,7 @@
 #include "thread_pool.h"
 #include "event_loop.h"
 #include "event_loop_thread.h"
+#include "../base/logger.h"
 #include <iostream>
 
 ThreadPool::ThreadPool(std::shared_ptr<EventLoop> mainloop, size_t maxn) :
@@ -12,14 +13,14 @@ ThreadPool::ThreadPool(std::shared_ptr<EventLoop> mainloop, size_t maxn) :
 }
 
 void ThreadPool::start() {
-    std::cout << "start thread pool|thread:" << maxn_ << std::endl;
+    LOG_INFO << "start thread pool|thread:" << maxn_;
     assert(mainloop_->isLoopThread());
     started_ = true;
     for (int i = 0; i < maxn_; ++i) {
         std::shared_ptr<EventLoopThread> t(new EventLoopThread());
         threads_.push_back(t);
         loops_.push_back(t->startLoop());
-        std::cout << "create thread " << loops_.back()->getThreadId() << " " << loops_.back().get() <<  std::endl;
+        LOG_INFO << "create thread " << loops_.back()->getThreadId() << " " << loops_.back().get();
     }
 }
 

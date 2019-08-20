@@ -5,11 +5,11 @@
 class KqueuePoller : public Poller {
 public:
     KqueuePoller();
-    virtual void add(std::shared_ptr<Channel> channel, uint64_t timeout = 0) override;
-    virtual void update(std::shared_ptr<Channel> channel) override;
-    virtual void remove(std::shared_ptr<Channel> channel) override;
-    virtual std::vector<std::shared_ptr<Channel>> poll() override;
-
+    virtual void update(Channel *channel) override;
+    virtual void remove(Channel *channel) override;
+    virtual int getTimerFd() override;
+    virtual std::vector<Channel*> poll() override;
+    virtual void wakeup() override;
 private:
     int kq_;
 };

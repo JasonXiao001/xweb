@@ -9,12 +9,14 @@ class Channel;
 class Poller {
 public:
     virtual ~Poller() {}
-    virtual void add(std::shared_ptr<Channel> channel, uint64_t timeout = 0) = 0;
-    virtual void update(std::shared_ptr<Channel> channel) = 0;
-    virtual void remove(std::shared_ptr<Channel> channel) = 0;
-    virtual std::vector<std::shared_ptr<Channel>> poll() = 0;
+    virtual void update(Channel *channel) = 0;
+    virtual void remove(Channel *channel) = 0;
+    virtual int getTimerFd() = 0;
+    virtual std::vector<Channel*> poll() = 0;
+    virtual void wakeup() = 0;
 protected:
-    std::map<int, std::shared_ptr<Channel>> channels_;
+    std::map<int, Channel*> channels_;
+    std::shared_ptr<Channel> wakeup_channel_;
 };
 
 
