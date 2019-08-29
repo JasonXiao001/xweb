@@ -1,4 +1,5 @@
 #include "thread_pool.h"
+#include <assert.h>
 #include "event_loop.h"
 #include "event_loop_thread.h"
 #include "../base/logger.h"

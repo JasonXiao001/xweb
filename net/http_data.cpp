@@ -1,4 +1,5 @@
 #include "http_data.h"
+#include <cstring>
 #include "channel.h"
 #include "event_loop.h"
 #include "../base/rio.h"

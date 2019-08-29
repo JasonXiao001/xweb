@@ -1,5 +1,5 @@
 aux_source_directory(. DIR_LIB_SRCS)
-
+link_directories(../base)
 
 IF (APPLE)
 	MESSAGE(STATUS "Apple systens.")
@@ -11,6 +11,6 @@ ELSEIF (UNIX)
 	MESSAGE(STATUS "UNIX-like OS's")
     add_subdirectory(linux)
     add_library (net ${DIR_LIB_SRCS})
-    target_link_libraries(net linuxnet)
+    target_link_libraries(net linuxnet base)
 ENDIF ()
 

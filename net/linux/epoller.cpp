@@ -1,5 +1,7 @@
 #include "epoller.h"
-#include "../base/logger.h"
+#include "../../base/logger.h"
+#include <unistd.h>
+#include "../channel.h"
 
 #define MAX_EVENT 1024
 
@@ -62,7 +64,7 @@ std::vector<Channel*> Epoller::poll() {
             if (events[i].events & EPOLLIN) {
                 evt |= CHANNEL_READ;
             }
-            if (events[i].filter == EPOLLOUT) {
+            if (events[i].events== EPOLLOUT) {
                 evt |= CHANNEL_WRITE;
             }
             // if (events[i].filter == EVFILT_TIMER) {
@@ -78,9 +80,12 @@ std::vector<Channel*> Epoller::poll() {
     return ret;
 }
 
-void KqueuePoller::wakeup() {
+void Epoller::wakeup() {
     // struct kevent changes[1];
     // EV_SET(&changes[0], wakeup_channel_->fd(), EVFILT_USER, 0, NOTE_TRIGGER, 0, NULL);
     // kevent(kq_, changes, 1, NULL, 0, NULL);
 }
 
+int Epoller::getTimerFd() {
+    return 0;
+}
