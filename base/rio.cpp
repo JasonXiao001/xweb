@@ -41,6 +41,8 @@ ssize_t rio_readn(int fd, void *usrbuf, size_t n) {
     ssize_t nread;
     char *bufp = (char *)usrbuf;
     while(nleft > 0) {
+        char *c = (char *)usrbuf;
+        
         if ((nread = read(fd, bufp, nleft)) < 0) {
             if (errno == EINTR) nread = 0;
             else return -1;

@@ -87,3 +87,5 @@ private:
 #define LOG_WARN Logger(__FILE__, __LINE__, Logger::E_WARN).stream()
 #define LOG_ERROR Logger(__FILE__, __LINE__, Logger::E_ERROR).stream()
 #define LOG_FATAL Logger(__FILE__, __LINE__, Logger::E_FATAL).stream()
+
+const char* strerror_tl(int savedErrno);

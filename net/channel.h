@@ -74,6 +74,8 @@ public:
     int getActiveEvent() const {
         return active_events_;
     }
+    bool isWriting() const { return events_ & CHANNEL_WRITE; }
+    bool isReading() const { return events_ & CHANNEL_READ; }
 private:
     int events_;
     int active_events_;

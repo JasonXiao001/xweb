@@ -6,9 +6,17 @@
 #include "windows.h"
 #else
 #include <sys/time.h>
+#include <errno.h>
 #endif
 
+__thread char t_errnobuf[512];
+
 static Logger::LogLevel g_logLevel = Logger::E_TRACE;
+
+const char* strerror_tl(int savedErrno) {
+    strerror_r(savedErrno, t_errnobuf, sizeof t_errnobuf);
+    return t_errnobuf;
+}
 
 
 void defaultOutput(const char* msg, int len)
