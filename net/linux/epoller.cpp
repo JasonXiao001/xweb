@@ -8,7 +8,7 @@
 
 static void wakeupRead(int fd) {
     uint64_t one = 1;
-    ssize_t n = sockets::read(fd, &one, sizeof one);
+    ssize_t n = read(fd, &one, sizeof one);
     if (n != sizeof one) {
         LOG_ERROR << "EventLoop::handleRead() reads " << n << " bytes instead of 8";
     }
@@ -98,7 +98,7 @@ std::vector<Channel*> Epoller::poll() {
     return ret;
 }
 
-void KqueuePoller::wakeup() {
+void Epoller::wakeup() {
     uint64_t one = 1;
     ssize_t n = write(wakeup_channel_->fd(), &one, sizeof one);
     if (n != sizeof one) {
