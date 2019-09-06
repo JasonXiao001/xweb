@@ -2,6 +2,7 @@
 #include <cstring>
 #include <string>
 #include <thread>
+#include <sstream>
 
 const int kSmallBuffer = 4000;
 const int kLargeBuffer = 4000*1000;
@@ -67,7 +68,9 @@ public:
 
     self& operator<<(const void*);
     self& operator<<(std::thread::id id) {
-        *this << std::hash<std::thread::id>()(id);
+        std::stringstream ss;
+        ss << id;
+        *this << ss.str();
         return *this;
     }
 
