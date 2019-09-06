@@ -1,4 +1,5 @@
 #include "event_loop.h"
+#include <assert.h>
 #include "poller.h"
 #include "channel.h"
 #include "../base/rio.h"

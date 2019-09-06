@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <cassert>
+#include <algorithm>
 #include <netinet/in.h>
 #ifndef __APPLE__
 #include <endian.h>

@@ -1,4 +1,7 @@
 #include <string>
+#ifndef __APPLE__
+#include <strings.h>
+#endif
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/types.h>
