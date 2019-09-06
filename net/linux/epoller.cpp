@@ -1,17 +1,37 @@
 #include "epoller.h"
 #include "../base/logger.h"
+#include <sys/eventfd.h>
 
 #define MAX_EVENT 1024
+
+static void wakeupRead(int fd) {
+    uint64_t one = 1;
+    ssize_t n = sockets::read(fd, &one, sizeof one);
+    if (n != sizeof one) {
+        LOG_ERROR << "EventLoop::handleRead() reads " << n << " bytes instead of 8";
+    }
+}
+
 
 Epoller::Epoller() :
     Poller(),
     epollfd_(epoll_create(1)) {
     if (epollfd_ == -1) {
         LOG_FATAL << "epoll create failed";
-    }   
+    }
+    int efd = eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
+    if (efd < 0) {
+        LOG_FATAL << "Failed in eventfd";
+    }
+    wakeup_channel_ = std::make_shared<Channel>(efd);
+    wakeup_channel_->setEvent(CHANNEL_READ);
+    wakeup_channel_->setReadHandler(std::bind(wakeupRead, efd));
+    update(wakeup_channel_.get());
 }
 
 Epoller::~Epoller() {
+    remove(wakeup_channel_.get());
+    close(wakeup_channel_->fd());
     close(epollfd_);
 }
 
@@ -71,16 +91,16 @@ std::vector<Channel*> Epoller::poll() {
             LOG_TRACE << "active fd:" << id << "|events:" << evt;
             channels_[id]->setActiveEvent(evt);
             ret.push_back(channels_[id]);
-        }else if (id == wakeup_channel_->fd()) {
-            // wake up
         }
     }
     return ret;
 }
 
 void KqueuePoller::wakeup() {
-    // struct kevent changes[1];
-    // EV_SET(&changes[0], wakeup_channel_->fd(), EVFILT_USER, 0, NOTE_TRIGGER, 0, NULL);
-    // kevent(kq_, changes, 1, NULL, 0, NULL);
+    uint64_t one = 1;
+    ssize_t n = write(wakeup_channel_->fd(), &one, sizeof one);
+    if (n != sizeof one) {
+        LOG_ERROR << "EventLoop::wakeup() writes " << n << " bytes instead of 8";
+    }
 }
 
