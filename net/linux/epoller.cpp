@@ -2,6 +2,7 @@
 #include <sys/eventfd.h>
 #include "../../base/logger.h"
 #include <unistd.h>
+#include <sys/timerfd.h>
 #include "../channel.h"
 
 #define MAX_EVENT 1024
@@ -50,6 +51,18 @@ void Epoller::update(Channel *channel) {
     if (evt & CHANNEL_WRITE) {
         event.events |= EPOLLOUT;
     }
+    if (evt & CHANNEL_TIMER) {
+        struct itimerspec new_value;
+        struct timespec now;
+        new_value.it_value.tv_sec = now.tv_sec;
+        new_value.it_value.tv_nsec = now.tv_nsec;
+        new_value.it_interval.tv_sec = 0;
+        new_value.it_interval.tv_nsec = channel->interval()*1000000;
+        if (timerfd_settime(fd, TFD_TIMER_ABSTIME, &new_value, NULL) == -1) {
+            LOG_ERROR << "timer set time error";
+            return;
+        }  
+    }
     bool modify = channels_.find(fd) != channels_.end();
     if(epoll_ctl(epollfd_, modify?EPOLL_CTL_MOD:EPOLL_CTL_ADD, fd, &event) < 0) {
         LOG_ERROR << "epoll_ctl error ";
@@ -87,12 +100,15 @@ std::vector<Channel*> Epoller::poll() {
             if (events[i].events== EPOLLOUT) {
                 evt |= CHANNEL_WRITE;
             }
-            // if (events[i].filter == EVFILT_TIMER) {
-            //     evt |= CHANNEL_TIMER;
-            // }
+            if (channels_[id]->events() & CHANNEL_TIMER) {
+                evt |= CHANNEL_TIMER;
+            }
             LOG_TRACE << "active fd:" << id << "|events:" << evt;
             channels_[id]->setActiveEvent(evt);
             ret.push_back(channels_[id]);
+            // if ((channels_[id]->events() & CHANNEL_TIMER) && !channels_[id]->repeat()) {
+            //     remove(channels_[id]);
+            // }
         }
     }
     return ret;
@@ -107,5 +123,9 @@ void Epoller::wakeup() {
 }
 
 int Epoller::getTimerFd() {
-    return 0;
+    int fd = timerfd_create(CLOCK_REALTIME, 0);
+    if (fd < 0) {
+        LOG_FATAL << "create timer fd error";
+    }
+    return fd;
 }
