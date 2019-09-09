@@ -41,6 +41,7 @@ void EventLoop::loop() {
     LOG_TRACE << "EventLoop " << this << " start";
     while(running_) {
         auto ret = poller_->poll();
+        LOG_TRACE << "active events " << ret.size();
         for (auto it = ret.begin(); it != ret.end(); ++it) {
             (*it)->handleEvent();
         }
@@ -110,7 +111,7 @@ int EventLoop::runAfter(int64_t delay, Functor &&cb) {
     runInLoop([this, delay, cb, fd]() mutable{
         auto channel = std::unique_ptr<Channel>(new Channel);
         channel->setRepeat(false);
-        channel->setInterval(0);
+        channel->setInterval(delay);
         channel->setEvent(CHANNEL_TIMER);
         channel->setTimerHandler(std::move(cb));
         channel->setFd(fd);

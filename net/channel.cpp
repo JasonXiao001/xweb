@@ -22,6 +22,7 @@ Channel::Channel() :
 }
 
 void Channel::handleEvent() {
+    LOG_TRACE << "active " << active_events_;
     if (isListenFd_) {
         connHandler_();
     }else if (active_events_ & CHANNEL_READ) {
